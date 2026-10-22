@@ -172,4 +172,6 @@ services:
       - all
     read_only: true
     hostname: user-simulator
+    # Each run makes 200 requests and exits; restarting keeps steady traffic flowing.
+    restart: always
     command: "-d 60 -r 200 -c 2 -h edge-router"
