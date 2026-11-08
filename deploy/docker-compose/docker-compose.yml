@@ -57,7 +57,9 @@ services:
     environment:
       - JAVA_OPTS=-Xms64m -Xmx128m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom -Dspring.zipkin.enabled=false
   carts-db:
-    image: mongo:3.4
+    image: mongo:4.4
+    # MongoDB caps its cache at half of RAM minus 1 GB by default, per server.
+    command: ["--wiredTigerCacheSizeGB", "0.25"]
     hostname: carts-db
     restart: always
     cap_drop:
@@ -83,7 +85,9 @@ services:
     environment:
       - JAVA_OPTS=-Xms64m -Xmx128m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom -Dspring.zipkin.enabled=false
   orders-db:
-    image: mongo:3.4
+    image: mongo:4.4
+    # MongoDB caps its cache at half of RAM minus 1 GB by default, per server.
+    command: ["--wiredTigerCacheSizeGB", "0.25"]
     hostname: orders-db
     restart: always
     cap_drop:
@@ -154,7 +158,9 @@ services:
     environment:
       - MONGO_HOST=user-db:27017
   user-db:
-    image: weaveworksdemos/user-db:0.4.0
+    # Built from the user fork's docker/user-db (branch mongo-4.4).
+    image: sockshop-user-db:4.4
+    command: ["mongod", "--config", "/etc/mongodb.conf", "--wiredTigerCacheSizeGB", "0.25"]
     hostname: user-db
     restart: always
     cap_drop:
