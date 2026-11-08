@@ -44,7 +44,8 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD=true
       - MYSQL_DATABASE=socksdb
   carts:
-    image: weaveworksdemos/carts:0.4.8
+    # Built from the carts fork's mongo-driver branch, so MongoDB calls show in traces.
+    image: sockshop-carts:mongo-driver
     hostname: carts
     restart: always
     cap_drop:
@@ -72,7 +73,8 @@ services:
     tmpfs:
       - /tmp:rw,noexec,nosuid
   orders:
-    image: weaveworksdemos/orders:0.4.7
+    # Built from the orders fork's mongo-driver branch, so MongoDB calls show in traces.
+    image: sockshop-orders:mongo-driver
     hostname: orders
     restart: always
     cap_drop:
@@ -147,7 +149,8 @@ services:
       - NET_BIND_SERVICE
     read_only: true
   user:
-    image: weaveworksdemos/user:0.4.4
+    # Built from the user fork's mongo-driver branch, so MongoDB calls show in traces.
+    image: sockshop-user:mongo-driver
     hostname: user
     restart: always
     cap_drop:
