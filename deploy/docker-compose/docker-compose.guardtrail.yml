@@ -1,0 +1,55 @@
+# Links each Sock Shop service to its source for GuardTrail. Beyla reads
+# OTEL_RESOURCE_ATTRIBUTES from each app container; the prebuilt images carry no
+# repository or commit. The revision is the commit behind each image tag in
+# docker-compose.yml. Service names come from the connector's Beyla config,
+# which maps each Compose container to its service.
+#
+# shipping and queue-master talk to RabbitMQ over AMQP 0-9-1, which Beyla cannot
+# trace, so they run the OpenTelemetry Java agent (v2.33.1, in ./otel) and send
+# traces to the GuardTrail collector; Beyla leaves them to it.
+#
+# docker compose -f docker-compose.yml -f docker-compose.guardtrail.yml up -d
+services:
+  front-end:
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: vcs.repository.url.full=https://github.com/26tanishabanik/front-end,vcs.ref.head.revision=b2308a3ecc70b9ac97b93ce73985e57d5d0c186b
+  edge-router:
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: vcs.repository.url.full=https://github.com/26tanishabanik/edge-router,vcs.ref.head.revision=add334745de8e74d9014c9e97074fb0d4e7a0847
+  catalogue:
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: vcs.repository.url.full=https://github.com/26tanishabanik/catalogue,vcs.ref.head.revision=93452255c62cac6e44f5d86376d7cb3c5409e162
+  carts:
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: vcs.repository.url.full=https://github.com/26tanishabanik/carts,vcs.ref.head.revision=24dbf03e965b7866b757aa88e38ae6ed53588c2d
+  orders:
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: vcs.repository.url.full=https://github.com/26tanishabanik/orders,vcs.ref.head.revision=4ce1adef0667f1e03fc76ec097ac16449a9430ee
+  shipping:
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: vcs.repository.url.full=https://github.com/26tanishabanik/shipping,vcs.ref.head.revision=c3bc9015fdbfce1265370502c4fd19b45120550e
+      JAVA_TOOL_OPTIONS: -javaagent:/otel/opentelemetry-javaagent.jar
+      OTEL_SERVICE_NAME: shipping
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://guardtrail-collector:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+    volumes:
+      - ./otel/opentelemetry-javaagent.jar:/otel/opentelemetry-javaagent.jar:ro
+  queue-master:
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: vcs.repository.url.full=https://github.com/26tanishabanik/queue-master,vcs.ref.head.revision=ca72773d51ca4676306e6c5f25835990f3753748
+      JAVA_TOOL_OPTIONS: -javaagent:/otel/opentelemetry-javaagent.jar
+      OTEL_SERVICE_NAME: queue-master
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://guardtrail-collector:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
+    volumes:
+      - ./otel/opentelemetry-javaagent.jar:/otel/opentelemetry-javaagent.jar:ro
+  payment:
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: vcs.repository.url.full=https://github.com/26tanishabanik/payment,vcs.ref.head.revision=923c8b030364fd4e217c54cd1e30150b7cad4266
+  user:
+    environment:
+      OTEL_RESOURCE_ATTRIBUTES: vcs.repository.url.full=https://github.com/26tanishabanik/user,vcs.ref.head.revision=bb1bb0d761b29c3fded49c122e5e6edd77c22b95
