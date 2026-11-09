@@ -128,7 +128,8 @@ services:
     tmpfs:
       - /tmp:rw,noexec,nosuid
   rabbitmq:
-    image: rabbitmq:3.6.8
+    # 3.8+ with the management plugin, for the collector's RabbitMQ receiver.
+    image: rabbitmq:3.13-management
     hostname: rabbitmq
     restart: always
     cap_drop:
